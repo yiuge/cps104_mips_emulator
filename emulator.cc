@@ -16,6 +16,7 @@ unsigned int stack[2*1024]; //byte addressable
 //Be sure to consider that from the program's perspective, the text segment begins at address 0x00400000 and the static data segment begins at address 0x10010000
 int registers[32];
 // r29 is the stack pointer
+
 int pc; //Program counter
 int hireg;
 int loreg;
@@ -26,16 +27,10 @@ int getAddress(int address) {
 		return stack[address - 0x7fffeffc];
 	}
 
-<<<<<<< HEAD:emulator.cc
 	 	if (address>=0x00400000 && address < 0x10010000) {
 	  		return text[address - 0x00400000];
 		}
 
-=======
-	if (address>0x00400000 && address < 0x10010000) {
-		return text[address - 0x00400000];
-	}
->>>>>>> 6cd37c661da309c6cec7265751b2b0cd05984c54:emulator.cc
 
 	if (address >= 0x10010000) {
 		return staticData[address - 0x10010000];
@@ -52,20 +47,13 @@ int storeAddress(int address, int wordToStore) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-<<<<<<< HEAD:emulator.cc
+
 		if (address >= 0x10010000) {
 			return staticData[address - 0x10010000] = wordToStore;
 		}
+
 	}
 
-	void lb(int a, int b, int c) {
-		registers[a] = getAddress(b+registers[c]);
-=======
-	if (address > 0x10010000) {
-		return staticData[address - 0x10010000] = wordToStore;
->>>>>>> 6cd37c661da309c6cec7265751b2b0cd05984c54:emulator.cc
-	}
-}
 
 void lb(int a, int b, int c) {
 	registers[a] = getAddress(b+registers[c]);
