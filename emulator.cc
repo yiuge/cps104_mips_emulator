@@ -22,31 +22,31 @@ int loreg;
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
 int getAddress(int address) {
-	if (address>0x7fffeffc && address < 0x00400000) {
+	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc];
 	}
 
-	 	if (address>0x00400000 && address < 0x10010000) {
+	 	if (address>=0x00400000 && address < 0x10010000) {
 	  		return text[address - 0x00400000];
 		}
 
 
-	if (address > 0x10010000) {
+	if (address >= 0x10010000) {
 		return staticData[address - 0x10010000];
 	}
 }
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
 int storeAddress(int address, int wordToStore) {
-	if (address>0x7fffeffc && address < 0x00400000) {
+	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
 
-	if (address>0x00400000 && address < 0x10010000) {
+	if (address>=0x00400000 && address < 0x10010000) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-		if (address > 0x10010000) {
+		if (address >= 0x10010000) {
 			return staticData[address - 0x10010000] = wordToStore;
 		}
 	}
@@ -239,16 +239,16 @@ int storeAddress(int address, int wordToStore) {
 	}
 
 	void jump(int c) {
-		pc = (pc & 0xF0000000) + c*4;
+	  pc = (pc & 0xF0000000) + (c & 0xFFFF);
 	}
 
 	void jal(int c) {
 		registers[31] = pc + 4;
-		pc = (pc & 0xF0000000) + c*4;;
+		pc = (pc & 0xF0000000) + c;
 	}
 
 	void jr(int a) {
-		pc = (pc & 0xF0000000) + registers[a]*4;
+	  pc = (pc & 0xF0000000) + registers[a];
 	}
 
 	void mfhi(int a) {
@@ -572,8 +572,7 @@ int storeAddress(int address, int wordToStore) {
 
 
 				if (input.substr(0, input.length()) == "p_all") {
-					for (int i=0; i<32; i++) {
-						cout << "register " << dec << i << ": "<< hex
+					for (int i=0; i<32; i++) {						cout << "register " << dec << i << ": "<< hex
 						<< registers[i] << endl;
 					}
 				} else if (input.at(0) == 'p') {
