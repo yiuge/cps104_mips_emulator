@@ -11,8 +11,8 @@
 using namespace std;
 
 unsigned int text[2*1024 / 4]; //word addressable
-unsigned int staticData[4*1024 / 4]; //byte addressable
-unsigned int stack[2*1024 / 4]; //byte addressable
+unsigned int staticData[4*1024]; //byte addressable
+unsigned int stack[2*1024]; //byte addressable
 //Be sure to consider that from the program's perspective, the text segment begins at address 0x00400000 and the static data segment begins at address 0x10010000
 int registers[32];
 // r29 is the stack pointer
