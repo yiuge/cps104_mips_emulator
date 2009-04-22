@@ -16,39 +16,44 @@ unsigned int stack[2*1024]; //byte addressable
 //Be sure to consider that from the program's perspective, the text segment begins at address 0x00400000 and the static data segment begins at address 0x10010000
 int registers[32];
 // r29 is the stack pointer
+
 int pc; //Program counter
 int hireg;
 int loreg;
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
 int getAddress(int address) {
-	if (address>0x7fffeffc && address < 0x00400000) {
+	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc];
 	}
 
-	if (address>0x00400000 && address < 0x10010000) {
-		return text[address - 0x00400000];
-	}
+	 	if (address>=0x00400000 && address < 0x10010000) {
+	  		return text[address - 0x00400000];
+		}
 
-	if (address > 0x10010000) {
+
+	if (address >= 0x10010000) {
 		return staticData[address - 0x10010000];
 	}
 }
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
 int storeAddress(int address, int wordToStore) {
-	if (address>0x7fffeffc && address < 0x00400000) {
+	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
 
-	if (address>0x00400000 && address < 0x10010000) {
+	if (address>=0x00400000 && address < 0x10010000) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-	if (address > 0x10010000) {
-		return staticData[address - 0x10010000] = wordToStore;
+
+		if (address >= 0x10010000) {
+			return staticData[address - 0x10010000] = wordToStore;
+		}
+
 	}
-}
+
 
 void lb(int a, int b, int c) {
 	registers[a] = getAddress(b+registers[c]);
@@ -83,7 +88,7 @@ void add(int dreg, int a, int b) {
 	registers[dreg] = registers[a] + registers[b];
 }
 
-//ADD rd, ra, c
+//ADDI rd, ra, c
 void addi(int dreg, int a, int c) {
 	registers[dreg] = registers[a] + c;
 }
@@ -229,6 +234,7 @@ void bne(int a, int b, int c) {
 		pc += (c & 0xFFFFF);
 }
 
+
 void jump(int c) {
 	pc = (pc & 0xF0000000) + (c & 0xFFFFF);
 }
@@ -241,6 +247,7 @@ void jal(int c) {
 void jr(int a) {
 	pc = (pc & 0xF0000000) + (registers[a] & 0xFFFFF);
 }
+
 
 void mfhi(int a) {
 	registers[a] = hireg;
@@ -320,6 +327,8 @@ void syscall() {
 void parseLine(int instruction) {
 	// increment program pointer
 	pc += 1;
+	registers[0] = 0;
+
 
 	//parse registry code
 	int opcode = (instruction & 0xFC000000) >> 26;
@@ -556,10 +565,12 @@ int main(int argc, char* argv[]) {
 			string input;
 			cin >> input;
 
+
 			//  p_reg print a specific register (e.g., p 4, prints the contents in hex of register 4)
 			//	p_all print the contents of all registers, including the PC, HI, & LO in hex
 			//	d_addr print the contents of memory location addr in hex, assume addr is a word address in hex.
 			//	s_n execute the next n instructions and stop (should print each instruction executed), then wait for the user to input another command
+
 
 
 			if (input.substr(0, input.length()) == "p_all") {
