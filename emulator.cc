@@ -136,7 +136,7 @@ void orfunc(int dreg, int a, int b) {
 }
 
 //ORI rd, ra, c
-void ori(int dreg, int a, int c) {
+void ori(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] | c;
 }
 
@@ -340,7 +340,7 @@ void parseLine(int instruction) {
 	int funct = instruction & 0x3F;
 
 	// I-type
-	signed int imm = (signed short)(instruction & 0xFFFF);
+	short imm = instruction & 0xFFFF;
 	// J-type
 	int address = instruction & 0x3FFFFFF;
 
@@ -361,10 +361,10 @@ void parseLine(int instruction) {
 			jr(rs);
 			break;
 		case 0x10:
-			mfhi(rs);
+			mfhi(rd);
 			break;
 		case 0x12:
-			mflo(rs);
+			mflo(rd);
 			break;
 		case 0x18:
 			mult(rs, rt);
@@ -385,10 +385,10 @@ void parseLine(int instruction) {
 			sltu(rd, rs, rt);
 			break;
 		case 0x3:
-			sra(rs, rt, shift);
+			sra(rd, rt, shift);
 			break;
 		case 0x2:
-			srl(rs, rt, shift);
+			srl(rd, rt, shift);
 			break;
 		case 0x22:
 			sub(rd, rs, rt);
