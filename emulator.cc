@@ -80,8 +80,9 @@ void sw(int a, int b, int c) {
 	storeAddress(b+registers[c] + 3, (registers[a] & 0xFF000000) >> 24);
 }
 
-void lui(int a, int b) {
-	registers[a] = b << 16;
+void lui(int a, unsigned short b) {
+  unsigned int bval = b;
+	registers[a] = bval << 16;
 }
 //ADD rd, ra, rb
 void add(int dreg, int a, int b) {
@@ -116,16 +117,16 @@ void andfunc(int dreg, int a, int b) {
 //MULT ra, rb
 //Product goes into HI and LO registers
 void mult(int a, int b) {
-	long product = registers[a] * registers[b];
+	long long product = registers[a] * registers[b];
 	hireg = product >> 32;
-	loreg = (product << 32) >> 32;
+	loreg = product & 0xFFFFFFFF;
 }
 
 //MULTU ra, rb
 void multu(int a, int b) {
 	unsigned int unsA = registers[a];
 	unsigned int unsB = registers[b];
-	long product = unsA * unsB;
+	long long product = unsA * unsB;
 	hireg = product >> 32;
 	loreg = (product << 32) >> 32;
 }
