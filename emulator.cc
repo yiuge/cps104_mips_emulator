@@ -54,7 +54,7 @@ int storeAddress(int address, int wordToStore) {
 
 //LB ra, b(rc)
 void lb(int a, int b, int c) {
-	registers[a] = getAddress(b+registers[c]);
+	registers[a] = (signed int)(signed char)(getAddress(b+registers[c]) & 0xFF);
 }
 
 //LBU ra, b(rc)
@@ -74,10 +74,10 @@ void sb(int a, int b, int c) {
 }
 
 void sw(int a, int b, int c) {
-	storeAddress(b+registers[c], registers[a] & 0xFF);
-	storeAddress(b+registers[c] + 1, (registers[a] & 0xFF00) >> 8);
-	storeAddress(b+registers[c] + 2, (registers[a] & 0xFF0000) >> 16);
-	storeAddress(b+registers[c] + 3, (registers[a] & 0xFF000000) >> 24);
+	storeAddress(b+registers[c] + 3, (registers[a] & 0xFF));
+	storeAddress(b+registers[c] + 2, ((registers[a] & 0xFF00) >> 8)));
+	storeAddress(b+registers[c] + 1, (registers[a] & 0xFF0000) >> 16));
+	storeAddress(b+registers[c], (((registers[a] & 0xFF000000) >> 24)));
 }
 
 void lui(int a, unsigned short b) {
