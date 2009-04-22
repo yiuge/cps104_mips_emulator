@@ -264,26 +264,40 @@ void mflo(int a) {
 	registers[a] = loreg;
 }
 
+long long getNullTStringFromMemory(){
+
+	  int i = 0;
+	  long long tobePrinted;
+	  while(getAddress(registers[4]+i)!=0x0)
+	    {	      
+	      i++;
+	    }
+	 
+	  int j;
+	  for(j=0; j<i; j++){
+	    tobePrinted += (getAddress(registers[4]+j) << (i-j)*8);
+	    }
+	  tobePrinted = (tobePrinted << 8); //add null character
+		return tobePrinted;
+
+}
+
 void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-	  int tobePrinted = (getAddress(registers[4] + 3)) 
-			+ (getAddress(registers[4]+2)<< 8) 
-			+ (getAddress(registers[4]+1) << 16) 
-			+ (getAddress(registers[4]) << 24);;
 
-	  if(tobePrinted&&tobePrinted!=0) printf("%d", tobePrinted); //registers 4-7 are a0-a3
+	  long long tobePrinted = getNullTStringFromMemory();
+	  	  printf("This should be a decimal value: %d", tobePrinted); //registers 4-7 are a0-a3
+		  //	  cout << (char *) &tobePrinted << endl;
 	  //cout << dec << endl;
 	  //cout << registers[4] << endl;
-	break;
-	case 4:
-	  int toPrint = (getAddress(registers[4] + 3)) 
-			+ (getAddress(registers[4]+2)<< 8) 
-			+ (getAddress(registers[4]+1) << 16) 
-			+ (getAddress(registers[4]) << 24);;
-	  if(toPrint&&toPrint!=0) printf("%s", toPrint); //registers 4-7 are a0-a3
-		//cout << registers[4] << endl;
+	  break;
+	case 4: 
+	  long long toPrint = getNullTStringFromMemory();
+	  printf("This should be the string: %s", toPrint); //registers 4-7 are a0-a3
+	  cout << toPrint << endl;
+	  //cout << registers[4] << endl;
 	  break;
 	case 5:
 	  scanf("%d", &v0);
