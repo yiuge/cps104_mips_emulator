@@ -89,7 +89,7 @@ void add(int dreg, int a, int b) {
 }
 
 //ADDI rd, ra, c
-void addi(int dreg, int a, int c) {
+void addi(int dreg, int a, signed int c) {
 	registers[dreg] = registers[a] + c;
 }
 
@@ -340,7 +340,7 @@ void parseLine(int instruction) {
 	int funct = instruction & 0x3F;
 
 	// I-type
-	int imm = instruction & 0xFFFF;
+	signed int imm = (signed short)(instruction & 0xFFFF);
 	// J-type
 	int address = instruction & 0x3FFFFFF;
 
