@@ -44,8 +44,11 @@ int storeAddress(unsigned int address, int wordToStore) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-	if (address >= 0x10010000) {
-		return staticData[address - 0x10010000] = wordToStore;
+
+		if (address >= 0x10010000) {
+		  return staticData[address - 0x10010000] = wordToStore;
+		}
+
 	}
 
 }
@@ -263,29 +266,23 @@ void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-		//	  int toPrint = lw(registers[4]);
-		cout << " syscall's int printf " << endl;
-		int toPrint = (getAddress(registers[4] + 3)) 
-				+ (getAddress(registers[4]+2)<< 8) 
-				+ (getAddress(registers[4]+1) << 16)
-				+ (getAddress(registers[4]) << 24);
-		cout << "getAddr from " << hex << registers[4] << endl;
-		cout << "to print " << hex << toPrint << endl;
-		//cout << dec << endl;
-		//cout << registers[4] << endl;
-		break;
+	cout << " syscall's int printf " << endl;  
+	
+	int tobePrinted = (getAddress(registers[4] + 3)) 
+			+ (getAddress(registers[4]+2)<< 8) 
+			+ (getAddress(registers[4]+1) << 16) 
+			+ (getAddress(registers[4]) << 24);;
+
+	  if(tobePrinted&&tobePrinted!=0) printf("%d", tobePrinted); //registers 4-7 are a0-a3
+	  //cout << dec << endl;
+	  //cout << registers[4] << endl;
+	break;
 	case 4:
-		cout << " syscall's string printf " << endl;
-		int tobePrinted = (getAddress(registers[4] + 3))
-				+ (getAddress(registers[4]+2)<< 8)
-				+ (getAddress(registers[4]+1) << 16)
-				+ (getAddress(registers[4]) << 24);
-		cout << "address is " << registers[4] << endl;
-		cout << "tobePrinted " << tobePrinted << endl; 
-		int strAdd = getAddress(registers[4]);
-		printf("%s", &strAdd); //registers 4-7 are a0-a3
-		//	  	printf("%s", toPrint); //registers 4-7 are a0-a3
-		//cout << registers[4] << endl;
+	  int toPrint = (getAddress(registers[4] + 3)) 
+			+ (getAddress(registers[4]+2)<< 8) 
+			+ (getAddress(registers[4]+1) << 16) 
+			+ (getAddress(registers[4]) << 24);;
+	  if(toPrint&&toPrint!=0) printf("%s", toPrint); //registers 4-7 are a0-a3
 		break;
 	case 5:
 		scanf("%s", &v0);
@@ -545,14 +542,11 @@ void readFile(string filename) {
 		int secondInt;
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
-		cout << "first: " << hex << firstInt << ", second: " << secondInt
-				<< endl;
 		//		storeAddress(firstInt, secondInt);
-		cout << "getadd " << hex << getAddress(firstInt) << endl;
-		storeAddress(firstInt + 3, (secondInt & 0xFF));
-		storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
-		storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
-		storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
+ 	storeAddress(firstInt + 3, (secondInt & 0xFF));
+ 	storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
+ 	storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
+ 	storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
 	}
 
 }
