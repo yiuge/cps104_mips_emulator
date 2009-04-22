@@ -397,7 +397,7 @@ void parseLine(int instruction) {
 		break;
 		// I-type
 	case 0x08: //addi
-		addi(rs, rt, imm);
+		addi(rt, rs, imm);
 		break;
 	case 0x09:
 		addiu(rs, rt, imm);
