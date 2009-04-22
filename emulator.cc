@@ -47,7 +47,7 @@ int storeAddress(int address, int wordToStore) {
 
 
 		if (address >= 0x10010000) {
-			return staticData[address - 0x10010000] = wordToStore;
+		  return staticData[address - 0x10010000] = wordToStore;
 		}
 
 	}
@@ -268,15 +268,21 @@ void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-	  int tobePrinted = getAddress(registers[4]);
+	  int tobePrinted = (getAddress(registers[4] + 3)) 
+			+ (getAddress(registers[4]+2)<< 8) 
+			+ (getAddress(registers[4]+1) << 16) 
+			+ (getAddress(registers[4]) << 24);;
 
-	  printf("%d", tobePrinted); //registers 4-7 are a0-a3
+	  if(tobePrinted&&tobePrinted!=0) printf("%d", tobePrinted); //registers 4-7 are a0-a3
 	  //cout << dec << endl;
 	  //cout << registers[4] << endl;
 	break;
 	case 4:
-	  int toPrint = getAddress(registers[4]);
-	  	printf("%s", toPrint); //registers 4-7 are a0-a3
+	  int toPrint = (getAddress(registers[4] + 3)) 
+			+ (getAddress(registers[4]+2)<< 8) 
+			+ (getAddress(registers[4]+1) << 16) 
+			+ (getAddress(registers[4]) << 24);;
+	  if(toPrint&&toPrint!=0) printf("%s", toPrint); //registers 4-7 are a0-a3
 		//cout << registers[4] << endl;
 	  break;
 	case 5:
@@ -538,11 +544,11 @@ void readFile(string filename) {
 		int secondInt;
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
-		storeAddress(firstInt, secondInt);
-// 	storeAddress(firstInt + 3, (secondInt & 0xFF));
-// 	storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
-// 	storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
-// 	storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
+		//		storeAddress(firstInt, secondInt);
+ 	storeAddress(firstInt + 3, (secondInt & 0xFF));
+ 	storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
+ 	storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
+ 	storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
 	}
 
 }
