@@ -64,9 +64,10 @@ void lbu(int a, unsigned int b, int c) {
 
 //LW ra, b(rc)
 void lw(int a, int b, int c) {
-	registers[a] = (getAddress(b+registers[c])) + (getAddress(b+registers[c]+1)
-			<< 8) + (getAddress(b+registers[c]+2) << 16) + (getAddress(b
-			+registers[c]+3) << 24);
+	registers[a] = (getAddress(b+registers[c] + 3)) 
+			+ (getAddress(b+registers[c]+2)<< 8) 
+			+ (getAddress(b+registers[c]+1) << 16) 
+			+ (getAddress(b+registers[c]) << 24);
 }
 
 void sb(int a, int b, int c) {
