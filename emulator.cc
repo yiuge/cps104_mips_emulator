@@ -48,9 +48,6 @@ int storeAddress(unsigned int address, int wordToStore) {
 		if (address >= 0x10010000) {
 		  return staticData[address - 0x10010000] = wordToStore;
 		}
-
-	}
-
 }
 
 //LB ra, b(rc)
@@ -271,21 +268,32 @@ void syscall() {
 	int tobePrinted = (getAddress(registers[4] + 3)) 
 			+ (getAddress(registers[4]+2)<< 8) 
 			+ (getAddress(registers[4]+1) << 16) 
-			+ (getAddress(registers[4]) << 24);;
+			+ (getAddress(registers[4]) << 24);
 
-	  if(tobePrinted&&tobePrinted!=0) printf("%d", tobePrinted); //registers 4-7 are a0-a3
+	 printf("%d", tobePrinted); //registers 4-7 are a0-a3
 	  //cout << dec << endl;
 	  //cout << registers[4] << endl;
 	break;
 	case 4:
-	  int toPrint = (getAddress(registers[4] + 3)) 
-			+ (getAddress(registers[4]+2)<< 8) 
-			+ (getAddress(registers[4]+1) << 16) 
-			+ (getAddress(registers[4]) << 24);;
-	  if(toPrint&&toPrint!=0) printf("%s", toPrint); //registers 4-7 are a0-a3
+		cout << " syscall's string printf " << endl; 
+		char toPrint [80];
+		int stringIndex;
+		stringIndex = 0;
+		while (true) {
+			char ch = (char)(getAddress(registers[4] + stringIndex));
+			if (ch == 0) break;
+			toPrint [stringIndex] = ch;
+//			cout << "char at: " << stringIndex << " is: " << ch << endl;
+			stringIndex++;
+		}
+//	  int toPrint = (getAddress(registers[4] + 3)) 
+//			+ (getAddress(registers[4]+2)<< 8) 
+//			+ (getAddress(registers[4]+1) << 16) 
+//			+ (getAddress(registers[4]) << 24);;
+	    printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
 		break;
 	case 5:
-		scanf("%s", &v0);
+		scanf("%d", &v0);
 		//	cin << v0;
 		break;
 	case 8:
