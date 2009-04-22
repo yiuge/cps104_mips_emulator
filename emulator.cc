@@ -384,10 +384,10 @@ void parseLine(int instruction) {
 		case 0x0:
 			sll(rd, rt, shift);
 			break;
-		case 0x15A:
+		case 42:
 			slt(rd, rs, rt);
 			break;
-		case 0x15B:
+		case 43:
 			sltu(rd, rs, rt);
 			break;
 		case 0x3:
