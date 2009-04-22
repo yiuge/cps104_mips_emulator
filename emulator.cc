@@ -21,15 +21,14 @@ int hireg;
 int loreg;
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
-int getAddress(int address) {
+int getAddress(unsigned int address) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc];
 	}
 
-	 	if (address>=0x00400000 && address < 0x10010000) {
-	  		return text[address - 0x00400000];
-		}
-
+	if (address>=0x00400000 && address < 0x10010000) {
+		return text[address - 0x00400000];
+	}
 
 	if (address >= 0x10010000) {
 		return staticData[address - 0x10010000];
@@ -37,7 +36,7 @@ int getAddress(int address) {
 }
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
-int storeAddress(int address, int wordToStore) {
+int storeAddress(unsigned int address, int wordToStore) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
@@ -45,12 +44,10 @@ int storeAddress(int address, int wordToStore) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-
-		if (address >= 0x10010000) {
-		  return staticData[address - 0x10010000] = wordToStore;
-		}
-
+	if (address >= 0x10010000) {
+		return staticData[address - 0x10010000] = wordToStore;
 	}
+}
 
 //LB ra, b(rc)
 void lb(int a, int b, int c) {
@@ -64,9 +61,8 @@ void lbu(int a, unsigned int b, int c) {
 
 //LW ra, b(rc)
 void lw(int a, int b, int c) {
-	registers[a] = (getAddress(b+registers[c] + 3)) 
-			+ (getAddress(b+registers[c]+2)<< 8) 
-			+ (getAddress(b+registers[c]+1) << 16) 
+	registers[a] = (getAddress(b+registers[c] + 3)) + (getAddress(b
+			+registers[c]+2)<< 8) + (getAddress(b+registers[c]+1) << 16)
 			+ (getAddress(b+registers[c]) << 24);
 }
 
@@ -82,7 +78,7 @@ void sw(int a, int b, int c) {
 }
 
 void lui(int a, unsigned short b) {
-  unsigned int bval = b;
+	unsigned int bval = b;
 	registers[a] = bval << 16;
 }
 //ADD dreg, ra, rb
@@ -238,7 +234,6 @@ void bne(int a, int b, int c) {
 		pc += (c & 0xFFFFF) - 1;
 }
 
-
 void jump(int c) {
 	pc = (pc & 0xF0000000) | (c & 0xFFFF);
 }
@@ -253,9 +248,8 @@ void jr(int a) {
 	if (a == 31) {
 		pc = (pc & 0xF0000000) | (registers[a] & 0xFFFF);
 	} else
-	pc = (pc & 0xF0000000) | ((registers[a] / 4) & 0xFFFF);
+		pc = (pc & 0xF0000000) | ((registers[a] / 4) & 0xFFFF);
 }
-
 
 void mfhi(int a) {
 	registers[a] = hireg;
@@ -264,20 +258,21 @@ void mflo(int a) {
 	registers[a] = loreg;
 }
 
-void getNullTStringFromMemory(char tobePrinted[]){
 
-	  int i = 0;
-	  while(getAddress(registers[4]+i)!=0x0)
-	    {	      
-	      i++;
-	    }
-	 
-	  int j;
-	  for(j=0; j<i; j++){
-	    tobePrinted[j]= (getAddress(registers[4]+j));
-	    }
-	  tobePrinted[j+1] = 0x00; //add null character
-		return tobePrinted;
+long long getNullTStringFromMemory() {
+
+	int i = 0;
+	long long tobePrinted;
+	while (getAddress(registers[4]+i)!=0x0) {
+		i++;
+	}
+
+	int j;
+	for (j=0; j<i; j++) {
+		tobePrinted += (getAddress(registers[4]+j) << (i-j)*8);
+	}
+	tobePrinted = (tobePrinted << 8); //add null character
+	return tobePrinted;
 
 }
 
@@ -286,28 +281,29 @@ void syscall() {
 	switch (v0) {
 	case 1:
 
-	  char tobePrinted[1000];
-	  getNullTStringFromMemory(tobePrinted);
-	  printf("This should be a decimal value: %d", tobePrinted); //registers 4-7 are a0-a3
-		  //	  cout << (char *) &tobePrinted << endl;
-	  //cout << dec << endl;
-	  //cout << registers[4] << endl;
-	  break;
-	case 4: 
-	  char toPrint[1000];
-	  getNullTStringFromMemory(toPrint);
-	  printf("This should be the string: %s", toPrint); //registers 4-7 are a0-a3
-	  cout << toPrint << endl;
-	  //cout << registers[4] << endl;
-	  break;
+		printf("%d", registers[4]); //registers 4-7 are a0-a3
+		break;
+	case 4:
+		char toPrint [80];
+		int stringIndex;
+		stringIndex = 0;
+		while (true) {
+			char ch = (char)(getAddress(registers[4] + stringIndex));
+			if (ch == 0)
+				break;
+			toPrint [stringIndex] = ch;
+			stringIndex++;
+		}
+		toPrint [stringIndex] = 0x0; // null at the end of the string
+		printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
+		break;
 	case 5:
-	  scanf("%d", &v0);
-	  //	cin << v0;
+		scanf("%d", &registers[2]);
 		break;
 	case 8:
 		char str [80];
-		//		int a0 = registers[4];
-		//		int a1 = registers[5];
+		//		a0 = registers[4];
+		//		a1 = registers[5];
 		scanf("%s", str);
 		registers[4] = (int) &str[0];
 		registers[5] = sizeof(str)/sizeof(char) + 1;
@@ -363,7 +359,6 @@ void parseLine(int instruction) {
 	// increment program pointer
 	pc += 1;
 	registers[0] = 0;
-
 
 	//parse registry code
 	int opcode = (instruction & 0xFC000000) >> 26;
@@ -554,16 +549,16 @@ void readFile(string filename) {
 		cout << "gonna split string: " << first << endl;
 		string firstStr=first.substr(0, 10);
 		string secondStr=first.substr(11, 10);
-		cout << "split strings correctly" << endl;
+		//		cout << "split strings correctly" << endl;
 		int firstInt;
 		int secondInt;
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
 		//		storeAddress(firstInt, secondInt);
- 	storeAddress(firstInt + 3, (secondInt & 0xFF));
- 	storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
- 	storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
- 	storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
+		storeAddress(firstInt + 3, (secondInt & 0xFF));
+		storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
+		storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
+		storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
 	}
 
 }
@@ -576,12 +571,12 @@ int main(int argc, char* argv[]) {
 	//    string fileName = "./sum.o";
 	//	cout << fileName << endl;
 	string fileName;
-//	cout << "Enter name of instruction file: ";
-//	cin >> fileName;
+	//	cout << "Enter name of instruction file: ";
+	//	cin >> fileName;
 	fileName = "torture.o";
-//	cout << "Choose Mode (0:Run to completion; 1:Single step): ";
+	//	cout << "Choose Mode (0:Run to completion; 1:Single step): ";
 	int mode;
-//	cin >> mode;
+	//	cin >> mode;
 	mode = 0;
 	//mode 0 = run to completion
 	//mode 1 = step through program
@@ -589,12 +584,11 @@ int main(int argc, char* argv[]) {
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
 
-		cout << "instruction: " << text[pc] << endl;
+		//		cout << "instruction: " << text[pc] << endl;
 
 		while (true) {
-			cout << "pc: " << pc << endl;
-			cout << "parseline: " << text[pc] << endl;
-			
+			//			cout << "pc: " << pc << endl;
+			//			cout << "parseline: " << text[pc] << endl;
 			parseLine(text[pc]);
 		}
 	} else if (mode == 1) { //single step through program
@@ -604,12 +598,10 @@ int main(int argc, char* argv[]) {
 			string input;
 			cin >> input;
 
-
 			//  p_reg print a specific register (e.g., p 4, prints the contents in hex of register 4)
 			//	p_all print the contents of all registers, including the PC, HI, & LO in hex
 			//	d_addr print the contents of memory location addr in hex, assume addr is a word address in hex.
 			//	s_n execute the next n instructions and stop (should print each instruction executed), then wait for the user to input another command
-
 
 
 			if (input.substr(0, input.length()) == "p_all") {
@@ -646,9 +638,9 @@ int main(int argc, char* argv[]) {
 
 		}
 	}
-	for (int i=0; i<32; i++) {
-		cout << hex << registers[i] << endl;
-	}
+	//	for (int i=0; i<32; i++) {
+	//		cout << hex << registers[i] << endl;
+	//	}
 	cout << "end of program" << endl;
 	return 0;
 }
