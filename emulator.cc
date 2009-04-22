@@ -565,6 +565,7 @@ int main(int argc, char* argv[]) {
 		while (true) {
 			cout << "pc: " << pc << endl;
 			cout << "parseline: " << text[pc] << endl;
+			
 			parseLine(text[pc]);
 		}
 	} else if (mode == 1) { //single step through program
