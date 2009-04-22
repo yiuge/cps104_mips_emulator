@@ -136,14 +136,16 @@ void orfunc(int dreg, int a, int b) {
 }
 
 //ORI rd, ra, c
-void ori(int dreg, int a, unsigned int c) {
-	registers[dreg] = registers[a] | c;
+void ori(int dreg, int a, unsigned short c) {
+	unsigned int shift = (unsigned short) c;
+	registers[dreg] = registers[a] | shift;
 }
 
 //XOR rd, r1, r2
 void xorfunc(int dreg, int reg1, int reg2) {
-	registers[dreg] = (registers[reg1]&(!registers[reg2])) | (registers[reg2]
-			&(!registers[reg1]));
+//	registers[dreg] = (registers[reg1]&(!registers[reg2])) | (registers[reg2]
+//			&(!registers[reg1]));
+	registers[dreg] = registers[reg1] ^ registers[reg2];
 }
 
 //SLL rd, ra, c
