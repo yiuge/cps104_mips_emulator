@@ -1,4 +1,3 @@
-#include "emulator.h"
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -118,7 +117,7 @@ void andfunc(int dreg, int a, int b) {
 //MULT ra, rb
 //Product goes into HI and LO registers
 void mult(int a, int b) {
-	long long product = registers[a] * registers[b];
+	unsigned long product = registers[a] * registers[b];
 	hireg = product >> 32;
 	loreg = product & 0xFFFFFFFF;
 }
