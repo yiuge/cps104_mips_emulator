@@ -12,15 +12,16 @@ using namespace std;
 unsigned int text[2*1024 / 4]; //word addressable
 unsigned int staticData[4*1024]; //byte addressable
 unsigned int stack[2*1024]; //byte addressable
-//Be sure to consider that from the program's perspective, the text segment begins at address 0x00400000 and the static data segment begins at address 0x10010000
 int registers[32];
-// r29 is the stack pointer
 
 int pc; //Program counter
 int hireg;
 int loreg;
 
-//takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
+/**
+ * Takes a byte-address in order to access the byte-addressable stack and static-data 
+ * segments of memory, except for text segment which is word addressable
+ */
 int getAddress(unsigned int address) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc];
@@ -35,7 +36,10 @@ int getAddress(unsigned int address) {
 	}
 }
 
-//takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
+/**
+ * takes a byte-address in order to access the byte-addressable stack and 
+ * static-data segments of memory, except for text segment which is word addressable
+ */
 int storeAddress(unsigned int address, int wordToStore) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
@@ -259,31 +263,16 @@ void mflo(int a) {
 }
 
 
-long long getNullTStringFromMemory() {
-
-	int i = 0;
-	long long tobePrinted;
-	while (getAddress(registers[4]+i)!=0x0) {
-		i++;
-	}
-
-	int j;
-	for (j=0; j<i; j++) {
-		tobePrinted += (getAddress(registers[4]+j) << (i-j)*8);
-	}
-	tobePrinted = (tobePrinted << 8); //add null character
-	return tobePrinted;
-
-}
 
 void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-
+		// printf int
 		printf("%d", registers[4]); //registers 4-7 are a0-a3
 		break;
 	case 4:
+		// printf string
 		char toPrint [80];
 		int stringIndex;
 		stringIndex = 0;
@@ -298,63 +287,38 @@ void syscall() {
 		printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
 		break;
 	case 5:
+		// scanf int
 		scanf("%d", &registers[2]);
 		break;
 	case 8:
+		// scanf string
 		char str [80];
 		//		a0 = registers[4];
 		//		a1 = registers[5];
 		scanf("%s", str);
-		registers[4] = (int) &str[0];
-		registers[5] = sizeof(str)/sizeof(char) + 1;
+		registers[4] = (unsigned int) &str;
+		
+		int strIndex;
+		strIndex = 0;
+		while (true) {
+			char ch = str[strIndex];
+			if (ch == 0)
+				break;
+			strIndex++;
+		}
+		registers[5] = strIndex;
+//		registers[5] = sizeof(str)/sizeof(char) + 1;
 		break;
 	case 10:
+		// exit program
 		exit(1);
 		break;
 	}
 }
 
-/*
- LB load byte
- LBU load byte unsigned
- LW load word
- SB store byte
- SW store word
- LUI load upper immediate
- ADD add
- ADDI add immediate
- ADDU add without overflow
- ADDIU add immediate without overflow
- AND and
- MULT multiply
- MULTU unsigned multiply
- OR or
- ORI or immediate
- XOR xor
- SLL shift left logical
- SRA shift right arithmetic
- SRL shift right logical
- SUB subtract with overflow
- SUBU subtract without overflow
- SLT set less than
- SLTI set less than immediate
- SLTU set less than unsigned
- SLTIU set less than immediate unsigned
- BEQ branch on equal
- BGEZ branch on greater than equal zero
- BGTZ branch on greater than zero
- BLEZ branch on less than equal zero
- BLTZ branch on less than zero
- BNE branch on not equal
- J jump
- JAL jump and link
- JR jump register
- MFHI move from HI register
- MFLO move from LO register
- SYSCALL system call-like facilities that SPIM programs can use (implement syscall code 1,4,5,8,10)
+/**
+ * Takes an instruction, decodes it, and executes appropriate command
  */
-
-//Takes an instruction, decodes it, and executes appropriate command
 void parseLine(int instruction) {
 	// increment program pointer
 	pc += 1;
@@ -427,15 +391,15 @@ void parseLine(int instruction) {
 			subu(rd, rs, rt);
 			break;
 		case 0xC:
-			syscall(); // program breaks here
+			syscall();
 			break;
 		case 0x26:
 			xorfunc(rd, rs, rt);
 			break;
 		}
 		break;
-		// I-type
-	case 0x08: //addi
+	// I-type
+	case 0x08:
 		addi(rt, rs, imm);
 		break;
 	case 0x09:
@@ -492,7 +456,7 @@ void parseLine(int instruction) {
 	case 0x2B:
 		sw(rt, imm, rs);
 		break;
-		// J-type
+	// J-type
 	case 0x2:
 		jump(address);
 		break;
@@ -505,7 +469,9 @@ void parseLine(int instruction) {
 	}
 }
 
-//Takes the source file and reads each line into an array
+/**
+ * Takes the source file and reads each line into an array
+ */
 void readFile(string filename) {
 	string line;
 	ifstream myfile(filename.c_str());
@@ -539,22 +505,18 @@ void readFile(string filename) {
 
 	cout << "out of first loop" << endl;
 	unsigned int k;
-	// stop condition was wrong, need to be size - size of data segment
 	for (k = textSize + 1; k < entireFile.size(); k++) {
 		string first =entireFile[k];
 		if (first.empty())
 			break;
-		//		string::size_type pos;
-		//		pos=first.find(' ', 0);
 		cout << "gonna split string: " << first << endl;
 		string firstStr=first.substr(0, 10);
 		string secondStr=first.substr(11, 10);
-		//		cout << "split strings correctly" << endl;
 		int firstInt;
 		int secondInt;
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
-		//		storeAddress(firstInt, secondInt);
+		// store word equivalent to achieve byte alignment
 		storeAddress(firstInt + 3, (secondInt & 0xFF));
 		storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
 		storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
@@ -584,11 +546,7 @@ int main(int argc, char* argv[]) {
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
 
-		//		cout << "instruction: " << text[pc] << endl;
-
-		while (true) {
-			//			cout << "pc: " << pc << endl;
-			//			cout << "parseline: " << text[pc] << endl;
+		while (true) { // infinite loop because we expect user to have a syscall exit
 			parseLine(text[pc]);
 		}
 	} else if (mode == 1) { //single step through program
@@ -598,11 +556,13 @@ int main(int argc, char* argv[]) {
 			string input;
 			cin >> input;
 
-			//  p_reg print a specific register (e.g., p 4, prints the contents in hex of register 4)
+			//  p_reg print a specific register (e.g., p 4, prints 
+			//      the contents in hex of register 4)
 			//	p_all print the contents of all registers, including the PC, HI, & LO in hex
-			//	d_addr print the contents of memory location addr in hex, assume addr is a word address in hex.
-			//	s_n execute the next n instructions and stop (should print each instruction executed), then wait for the user to input another command
-
+			//	d_addr print the contents of memory location addr in hex, 
+			//		assume addr is a word address in hex.
+			//	s_n execute the next n instructions and stop (should print each 
+			//		instruction executed), then wait for the user to input another command
 
 			if (input.substr(0, input.length()) == "p_all") {
 				for (int i=0; i<32; i++) {
@@ -611,7 +571,6 @@ int main(int argc, char* argv[]) {
 				}
 			} else if (input.at(0) == 'p') {
 				int registerNum;
-				// these don't work for some reason, maybe going beyond the end of the string
 				sscanf(input.substr(2, input.size()-2).c_str(), "%d", &registerNum);
 				cout << "register " << dec << registerNum << ": " << hex
 						<< registers[registerNum] << endl;
@@ -638,9 +597,5 @@ int main(int argc, char* argv[]) {
 
 		}
 	}
-	//	for (int i=0; i<32; i++) {
-	//		cout << hex << registers[i] << endl;
-	//	}
-	cout << "end of program" << endl;
 	return 0;
 }
