@@ -84,32 +84,32 @@ void sw(int a, int b, int c) {
 void lui(int a, int b) {
 	registers[a] = b << 16;
 }
-//ADD rd, ra, rb
+//ADD dreg, ra, rb
 void add(int dreg, int a, int b) {
 	registers[dreg] = registers[a] + registers[b];
 }
 
-//ADDI rd, ra, c
+//ADDI dreg, ra, c
 void addi(int dreg, int a, signed int c) {
 	registers[dreg] = registers[a] + c;
 }
 
 //convert regular ints to unsigned ints
-//ADDU rd, ra, rb
+//ADDU dreg, ra, rb
 void addu(int dreg, int a, int b) {
 	unsigned int unsA = registers[a];
 	unsigned int unsB = registers[b];
 	registers[dreg] = unsA + unsB;
 }
 
-//ADDIU rd, ra, c
+//ADDIU dreg, ra, c
 void addiu(int dreg, int a, int c) {
 	unsigned int unsA = registers[a];
 	unsigned int unsC = c;
 	registers[dreg] = unsA + unsC;
 }
 
-//AND rd, ra, rb
+//AND dreg, ra, rb
 void andfunc(int dreg, int a, int b) {
 	registers[dreg] = registers[a] & registers[b];
 }
@@ -131,33 +131,33 @@ void multu(int a, int b) {
 	loreg = (product << 32) >> 32;
 }
 
-//OR rd, ra , rb
+//OR dreg, ra , rb
 void orfunc(int dreg, int a, int b) {
 	registers[dreg] = registers[a] | registers[b];
 }
 
-//ORI rd, ra, c
+//ORI dreg, ra, c
 void ori(int dreg, int a, int c) {
 	registers[dreg] = registers[a] | c;
 }
 
-//XOR rd, r1, r2
+//XOR dreg, r1, r2
 void xorfunc(int dreg, int reg1, int reg2) {
 	registers[dreg] = (registers[reg1]&(!registers[reg2])) | (registers[reg2]
 			&(!registers[reg1]));
 }
 
-//SLL rd, ra, c
+//SLL dreg, ra, c
 void sll(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] << c;
 }
 
-//SRA rd, ra, c
+//SRA dreg, ra, c
 void sra(int dreg, int a, signed int c) {
 	registers[dreg] = (signed int)registers[a] >> c;
 }
 
-//SRL rd, ra, c
+//SRL dreg, ra, c
 void srl(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] >> c;
 }
@@ -361,10 +361,10 @@ void parseLine(int instruction) {
 			jr(rs);
 			break;
 		case 0x10:
-			mfhi(rs);
+			mfhi(rd);
 			break;
 		case 0x12:
-			mflo(rs);
+			mflo(rd);
 			break;
 		case 0x18:
 			mult(rs, rt);
@@ -385,7 +385,7 @@ void parseLine(int instruction) {
 			sltu(rd, rs, rt);
 			break;
 		case 0x3:
-			sra(rs, rt, shift);
+			sra(rd, rt, shift);
 			break;
 		case 0x2:
 			srl(rs, rt, shift);
