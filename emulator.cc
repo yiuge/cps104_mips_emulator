@@ -136,15 +136,14 @@ void orfunc(int dreg, int a, int b) {
 	registers[dreg] = registers[a] | registers[b];
 }
 
-//ORI dreg, ra, c
-void ori(int dreg, int a, int c) {
+
+void ori(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] | c;
 }
 
 //XOR dreg, r1, r2
 void xorfunc(int dreg, int reg1, int reg2) {
-	registers[dreg] = (registers[reg1]&(!registers[reg2])) | (registers[reg2]
-			&(!registers[reg1]));
+	registers[dreg] = registers[reg1]^registers[reg2];
 }
 
 //SLL dreg, ra, c
@@ -340,7 +339,7 @@ void parseLine(int instruction) {
 	int funct = instruction & 0x3F;
 
 	// I-type
-	signed int imm = (signed short)(instruction & 0xFFFF);
+	short imm = instruction & 0xFFFF;
 	// J-type
 	int address = instruction & 0x3FFFFFF;
 
@@ -388,7 +387,7 @@ void parseLine(int instruction) {
 			sra(rd, rt, shift);
 			break;
 		case 0x2:
-			srl(rs, rt, shift);
+			srl(rd, rt, shift);
 			break;
 		case 0x22:
 			sub(rd, rs, rt);
@@ -549,12 +548,9 @@ int main(int argc, char* argv[]) {
 	readFile(fileName);
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
-		// need to implement running of program with parseLine
-		//		int i;
-		//		for (i = 0; i < (2*1024 / 4); i++) {
-		//			parseLine(text[i]);
-		//		}
-		// start reading text from text[0], then read text[pc]
+
+		cout << "instruction: " << text[pc] << endl;
+
 		while (text[pc] != 0) {
 			cout << "pc: " << pc << endl;
 			cout << "parseline: " << text[pc] << endl;
