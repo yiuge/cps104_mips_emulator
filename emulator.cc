@@ -549,12 +549,9 @@ int main(int argc, char* argv[]) {
 	readFile(fileName);
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
-		// need to implement running of program with parseLine
-		//		int i;
-		//		for (i = 0; i < (2*1024 / 4); i++) {
-		//			parseLine(text[i]);
-		//		}
-		// start reading text from text[0], then read text[pc]
+		
+		cout << "instruction: " << text[pc] << endl;
+		
 		while (text[pc] != 0) {
 			cout << "pc: " << pc << endl;
 			cout << "parseline: " << text[pc] << endl;
