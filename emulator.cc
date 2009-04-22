@@ -409,7 +409,7 @@ void parseLine(int instruction) {
 		addi(rt, rs, imm);
 		break;
 	case 0x09:
-		addiu(rs, rt, imm);
+		addiu(rt, rs, imm);
 		break;
 	case 0x4:
 		beq(rs, rt, imm);
@@ -537,11 +537,13 @@ int main(int argc, char* argv[]) {
 	//    string fileName = "./sum.o";
 	//	cout << fileName << endl;
 	string fileName;
-	cout << "Enter name of instruction file: ";
-	cin >> fileName;
-	cout << "Choose Mode (0:Run to completion; 1:Single step): ";
+//	cout << "Enter name of instruction file: ";
+//	cin >> fileName;
+	fileName = "torture.o";
+//	cout << "Choose Mode (0:Run to completion; 1:Single step): ";
 	int mode;
-	cin >> mode;
+//	cin >> mode;
+	mode = 0;
 	//mode 0 = run to completion
 	//mode 1 = step through program
 	readFile(fileName);
