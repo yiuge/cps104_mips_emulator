@@ -279,19 +279,9 @@ void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-		cout << " syscall's int printf " << endl;
-
-		int tobePrinted = (getAddress(registers[4] + 3))
-				+ (getAddress(registers[4]+2)<< 8)
-				+ (getAddress(registers[4]+1) << 16)
-				+ (getAddress(registers[4]) << 24);
-
-		printf("%d", tobePrinted); //registers 4-7 are a0-a3
-		//cout << dec << endl;
-		//cout << registers[4] << endl;
+		printf("%d", registers[4]); //registers 4-7 are a0-a3
 		break;
 	case 4:
-		cout << " syscall's string printf " << endl;
 		char toPrint [80];
 		int stringIndex;
 		stringIndex = 0;
@@ -300,23 +290,18 @@ void syscall() {
 			if (ch == 0)
 				break;
 			toPrint [stringIndex] = ch;
-			//			cout << "char at: " << stringIndex << " is: " << ch << endl;
 			stringIndex++;
 		}
-		//	  int toPrint = (getAddress(registers[4] + 3)) 
-		//			+ (getAddress(registers[4]+2)<< 8) 
-		//			+ (getAddress(registers[4]+1) << 16) 
-		//			+ (getAddress(registers[4]) << 24);;
+		toPrint [stringIndex] = 0x0; // null at the end of the string
 		printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
 		break;
 	case 5:
-		scanf("%d", &v0);
-		//	cin << v0;
+		scanf("%d", &registers[2]);
 		break;
 	case 8:
 		char str [80];
-		//		int a0 = registers[4];
-		//		int a1 = registers[5];
+		//		a0 = registers[4];
+		//		a1 = registers[5];
 		scanf("%s", str);
 		registers[4] = (int) &str[0];
 		registers[5] = sizeof(str)/sizeof(char) + 1;
