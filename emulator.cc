@@ -44,10 +44,9 @@ int storeAddress(unsigned int address, int wordToStore) {
 		return text[address - 0x00400000] = wordToStore;
 	}
 
-
-		if (address >= 0x10010000) {
-		  return staticData[address - 0x10010000] = wordToStore;
-		}
+	if (address >= 0x10010000) {
+		return staticData[address - 0x10010000] = wordToStore;
+	}
 }
 
 //LB ra, b(rc)
@@ -259,38 +258,56 @@ void mflo(int a) {
 	registers[a] = loreg;
 }
 
+long long getNullTStringFromMemory() {
+
+	int i = 0;
+	long long tobePrinted;
+	while (getAddress(registers[4]+i)!=0x0) {
+		i++;
+	}
+
+	int j;
+	for (j=0; j<i; j++) {
+		tobePrinted += (getAddress(registers[4]+j) << (i-j)*8);
+	}
+	tobePrinted = (tobePrinted << 8); //add null character
+	return tobePrinted;
+
+}
+
 void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-	cout << " syscall's int printf " << endl;  
-	
-	int tobePrinted = (getAddress(registers[4] + 3)) 
-			+ (getAddress(registers[4]+2)<< 8) 
-			+ (getAddress(registers[4]+1) << 16) 
-			+ (getAddress(registers[4]) << 24);
+		cout << " syscall's int printf " << endl;
 
-	 printf("%d", tobePrinted); //registers 4-7 are a0-a3
-	  //cout << dec << endl;
-	  //cout << registers[4] << endl;
-	break;
+		int tobePrinted = (getAddress(registers[4] + 3))
+				+ (getAddress(registers[4]+2)<< 8)
+				+ (getAddress(registers[4]+1) << 16)
+				+ (getAddress(registers[4]) << 24);
+
+		printf("%d", tobePrinted); //registers 4-7 are a0-a3
+		//cout << dec << endl;
+		//cout << registers[4] << endl;
+		break;
 	case 4:
-		cout << " syscall's string printf " << endl; 
+		cout << " syscall's string printf " << endl;
 		char toPrint [80];
 		int stringIndex;
 		stringIndex = 0;
 		while (true) {
 			char ch = (char)(getAddress(registers[4] + stringIndex));
-			if (ch == 0) break;
+			if (ch == 0)
+				break;
 			toPrint [stringIndex] = ch;
-//			cout << "char at: " << stringIndex << " is: " << ch << endl;
+			//			cout << "char at: " << stringIndex << " is: " << ch << endl;
 			stringIndex++;
 		}
-//	  int toPrint = (getAddress(registers[4] + 3)) 
-//			+ (getAddress(registers[4]+2)<< 8) 
-//			+ (getAddress(registers[4]+1) << 16) 
-//			+ (getAddress(registers[4]) << 24);;
-	    printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
+		//	  int toPrint = (getAddress(registers[4] + 3)) 
+		//			+ (getAddress(registers[4]+2)<< 8) 
+		//			+ (getAddress(registers[4]+1) << 16) 
+		//			+ (getAddress(registers[4]) << 24);;
+		printf("%s", &toPrint[0]); //registers 4-7 are a0-a3
 		break;
 	case 5:
 		scanf("%d", &v0);
@@ -551,10 +568,10 @@ void readFile(string filename) {
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
 		//		storeAddress(firstInt, secondInt);
- 	storeAddress(firstInt + 3, (secondInt & 0xFF));
- 	storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
- 	storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
- 	storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
+		storeAddress(firstInt + 3, (secondInt & 0xFF));
+		storeAddress(firstInt + 2, (((secondInt & 0xFF00) >> 8)));
+		storeAddress(firstInt + 1, (((secondInt & 0xFF0000) >> 16)));
+		storeAddress(firstInt, (((secondInt & 0xFF000000) >> 24)));
 	}
 
 }
