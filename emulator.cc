@@ -21,7 +21,7 @@ int hireg;
 int loreg;
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
-int getAddress(int address) {
+int getAddress(unsigned int address) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc];
 	}
@@ -37,7 +37,7 @@ int getAddress(int address) {
 }
 
 //takes a byte-address in order to access the byte-addressable stack and static-data segments of memory, except for text segment which is word addressable
-int storeAddress(int address, int wordToStore) {
+int storeAddress(unsigned int address, int wordToStore) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
@@ -531,6 +531,7 @@ void readFile(string filename) {
 		int secondInt;
 		sscanf(firstStr.c_str(), "%x", &firstInt);
 		sscanf(secondStr.c_str(), "%x", &secondInt);
+		cout << "first: " << hex << firstInt << ", second: " << secondInt << endl;
 		storeAddress(firstInt, secondInt);
 	}
 
@@ -557,11 +558,11 @@ int main(int argc, char* argv[]) {
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
 
-		cout << "instruction: " << text[pc] << endl;
+//		cout << "instruction: " << text[pc] << endl;
 
 		while (true) {
-			cout << "pc: " << pc << endl;
-			cout << "parseline: " << text[pc] << endl;
+//			cout << "pc: " << pc << endl;
+//			cout << "parseline: " << text[pc] << endl;
 			parseLine(text[pc]);
 		}
 	} else if (mode == 1) { //single step through program
@@ -613,9 +614,9 @@ int main(int argc, char* argv[]) {
 
 		}
 	}
-	for (int i=0; i<32; i++) {
-		cout << hex << registers[i] << endl;
-	}
+//	for (int i=0; i<32; i++) {
+//		cout << hex << registers[i] << endl;
+//	}
 	cout << "end of program" << endl;
 	return 0;
 }
