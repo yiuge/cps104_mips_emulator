@@ -234,20 +234,7 @@ void bne(int a, int b, int c) {
 		pc += (c & 0xFFFFF);
 }
 
-<<<<<<< HEAD:emulator.cc
-	void jump(int c) {
-	  pc = (pc & 0xF0000000) + (c & 0xFFFF);
-	}
 
-	void jal(int c) {
-		registers[31] = pc + 4;
-		pc = (pc & 0xF0000000) + c;
-	}
-
-	void jr(int a) {
-	  pc = (pc & 0xF0000000) + registers[a];
-	}
-=======
 void jump(int c) {
 	pc = (pc & 0xF0000000) + (c & 0xFFFFF);
 }
@@ -260,7 +247,7 @@ void jal(int c) {
 void jr(int a) {
 	pc = (pc & 0xF0000000) + (registers[a] & 0xFFFFF);
 }
->>>>>>> 6cd37c661da309c6cec7265751b2b0cd05984c54:emulator.cc
+
 
 void mfhi(int a) {
 	registers[a] = hireg;
@@ -576,66 +563,12 @@ int main(int argc, char* argv[]) {
 			string input;
 			cin >> input;
 
-<<<<<<< HEAD:emulator.cc
-	int main(int argc, char* argv[]) {
-		registers[29] = 0x7fffeffc;
-		pc = 0;
 
-		cout << "argc = " << argc << endl;
-		//    string fileName = "./sum.o";
-		//	cout << fileName << endl;
-		string fileName;
-		cout << "Enter name of instruction file: ";
-		cin >> fileName;
-		cout << "Choose Mode (0:Run to completion; 1:Single step): ";
-		int mode;
-		cin >> mode;
-		//mode 0 = run to completion
-		//mode 1 = step through program
-		readFile(fileName);
-		if (mode == 0) { //if user passes run to completion mode
-			cout << "run to completion mode------" << endl;
-			// need to implement running of program with parseLine
-			//		int i;
-			//		for (i = 0; i < (2*1024 / 4); i++) {
-			//			parseLine(text[i]);
-			//		}
-			// start reading text from text[0], then read text[pc]
-			while (text[pc] != 0) {
-				cout << "pc: " << pc << endl;
-				cout << "parseline: " << text[pc] << endl;
-				parseLine(text[pc]);
-			}
-		} else if (mode == 1) { //single step through program
-			cout << "single step mode------" << endl;
-
-			while (1) {
-				string input;
-				cin >> input;
-
-				//  p_reg print a specific register (e.g., p 4, prints the contents in hex of register 4)
-				//	p_all print the contents of all registers, including the PC, HI, & LO in hex
-				//	d_addr print the contents of memory location addr in hex, assume addr is a word address in hex.
-				//	s_n execute the next n instructions and stop (should print each instruction executed), then wait for the user to input another command
-
-
-				if (input.substr(0, input.length()) == "p_all") {
-					for (int i=0; i<32; i++) {						cout << "register " << dec << i << ": "<< hex
-						<< registers[i] << endl;
-					}
-				} else if (input.at(0) == 'p') {
-					int registerNum;
-					// these don't work for some reason, maybe going beyond the end of the string
-					sscanf(input.substr(2, input.size()-2).c_str(), "%d", &registerNum);
-					cout << "register " << dec << registerNum << ": " << hex
-					<< registers[registerNum] << endl;
-				}
-=======
 			//  p_reg print a specific register (e.g., p 4, prints the contents in hex of register 4)
 			//	p_all print the contents of all registers, including the PC, HI, & LO in hex
 			//	d_addr print the contents of memory location addr in hex, assume addr is a word address in hex.
 			//	s_n execute the next n instructions and stop (should print each instruction executed), then wait for the user to input another command
->>>>>>> 6cd37c661da309c6cec7265751b2b0cd05984c54:emulator.cc
+
 
 
 			if (input.substr(0, input.length()) == "p_all") {
