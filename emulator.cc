@@ -88,7 +88,7 @@ void add(int dreg, int a, int b) {
 	registers[dreg] = registers[a] + registers[b];
 }
 
-//ADD rd, ra, c
+//ADDI rd, ra, c
 void addi(int dreg, int a, int c) {
 	registers[dreg] = registers[a] + c;
 }
@@ -327,6 +327,8 @@ void syscall() {
 void parseLine(int instruction) {
 	// increment program pointer
 	pc += 1;
+	registers[0] = 0;
+
 
 	//parse registry code
 	int opcode = (instruction & 0xFC000000) >> 26;
