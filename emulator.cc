@@ -117,9 +117,11 @@ void andfunc(int dreg, int a, int b) {
 //MULT ra, rb
 //Product goes into HI and LO registers
 void mult(int a, int b) {
-	unsigned long product = registers[a] * registers[b];
-	hireg = product >> 32;
-	loreg = product & 0xFFFFFFFF;
+	long longa = registers[a];
+	long longb = registers[b];
+	unsigned long long product = longa * longb;
+	loreg = (int)((product << 32) >> 32);
+	hireg = (int)(product >> 32);
 }
 
 //MULTU ra, rb
@@ -207,46 +209,50 @@ void sltiu(int dreg, int a, int c) {
 
 void beq(int a, int b, int c) {
 	if (registers[a] == registers[b])
-		pc += (c & 0xFFFFF);
+		pc += ((c & 0xFFFFF) - 1);
 }
 
 void bgez(int a, int c) {
 	if (registers[a] >= 0)
-		pc += (c & 0xFFFFF);
+		pc += (c & 0xFFFFF) - 1;
 }
 
 void bgtz(int a, int c) {
 	if (registers[a] > 0)
-		pc += (c & 0xFFFFF);
+		pc += (c & 0xFFFFF) - 1;
 }
 
 void blez(int a, int c) {
 	if (registers[a] <= 0)
-		pc += (c & 0xFFFFF);
+		pc += (c & 0xFFFFF) - 1;
 }
 
 void bltz(int a, int c) {
 	if (registers[a] < 0)
-		pc += (c & 0xFFFFF);
+		pc += (c & 0xFFFFF) - 1;
 }
 
 void bne(int a, int b, int c) {
 	if (registers[a] != registers[b])
-		pc += (c & 0xFFFFF);
+		pc += (c & 0xFFFFF) - 1;
 }
 
 
 void jump(int c) {
-	pc = (pc & 0xF0000000) + (c & 0xFFFFF);
+	pc = (pc & 0xF0000000) | (c & 0xFFFF);
 }
 
 void jal(int c) {
-	registers[31] = pc + 4;
-	pc = (pc & 0xF0000000) + (c & 0xFFFFF);
+	registers[31] = pc;
+	pc = (pc & 0xF0000000) | (c & 0xFFFF);
 }
 
 void jr(int a) {
-	pc = (pc & 0xF0000000) + (registers[a] & 0xFFFFF);
+	// need to divide by 4 because address given as byte addressable
+	if (a == 31) {
+		pc = (pc & 0xF0000000) | (registers[a] & 0xFFFF);
+	} else
+	pc = (pc & 0xF0000000) | ((registers[a] / 4) & 0xFFFF);
 }
 
 
@@ -552,7 +558,7 @@ int main(int argc, char* argv[]) {
 
 		cout << "instruction: " << text[pc] << endl;
 
-		while (text[pc] != 0) {
+		while (true) {
 			cout << "pc: " << pc << endl;
 			cout << "parseline: " << text[pc] << endl;
 			parseLine(text[pc]);
