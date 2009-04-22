@@ -267,13 +267,17 @@ void syscall() {
 	int v0 = registers[2]; // register 2 is v0
 	switch (v0) {
 	case 1:
-		printf("%d", registers[4]); //registers 4-7 are a0-a3
-		break;
+	  printf("%d", registers[4]); //registers 4-7 are a0-a3
+	  //cout << dec << endl;
+	  //cout << registers[4] << endl;
+	break;
 	case 4:
-		printf("%d", registers[4]); //registers 4-7 are a0-a3
-		break;
+	  	printf("%s", registers[4]); //registers 4-7 are a0-a3
+		//cout << registers[4] << endl;
+	  break;
 	case 5:
-		scanf("%d", &v0);
+	  scanf("%d", &v0);
+	  //	cin << v0;
 		break;
 	case 8:
 		char str [80];
