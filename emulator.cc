@@ -1,4 +1,4 @@
-//#include "emulator.h"
+#include "emulator.h"
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -42,7 +42,6 @@ int storeAddress(int address, int wordToStore) {
 	if (address>=0x7fffeffc && address < 0x00400000) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
-
 	if (address>=0x00400000 && address < 0x10010000) {
 		return text[address - 0x00400000] = wordToStore;
 	}
@@ -54,15 +53,17 @@ int storeAddress(int address, int wordToStore) {
 
 	}
 
-
+//LB ra, b(rc)
 void lb(int a, int b, int c) {
 	registers[a] = getAddress(b+registers[c]);
 }
 
+//LBU ra, b(rc)
 void lbu(int a, unsigned int b, int c) {
 	registers[a] = getAddress(b+registers[c]);
 }
 
+//LW ra, b(rc)
 void lw(int a, int b, int c) {
 	registers[a] = (getAddress(b+registers[c])) + (getAddress(b+registers[c]+1)
 			<< 8) + (getAddress(b+registers[c]+2) << 16) + (getAddress(b
@@ -84,32 +85,32 @@ void lui(int a, unsigned short b) {
   unsigned int bval = b;
 	registers[a] = bval << 16;
 }
-//ADD rd, ra, rb
+//ADD dreg, ra, rb
 void add(int dreg, int a, int b) {
 	registers[dreg] = registers[a] + registers[b];
 }
 
-//ADDI rd, ra, c
+//ADDI dreg, ra, c
 void addi(int dreg, int a, signed int c) {
 	registers[dreg] = registers[a] + c;
 }
 
 //convert regular ints to unsigned ints
-//ADDU rd, ra, rb
+//ADDU dreg, ra, rb
 void addu(int dreg, int a, int b) {
 	unsigned int unsA = registers[a];
 	unsigned int unsB = registers[b];
 	registers[dreg] = unsA + unsB;
 }
 
-//ADDIU rd, ra, c
+//ADDIU dreg, ra, c
 void addiu(int dreg, int a, int c) {
 	unsigned int unsA = registers[a];
 	unsigned int unsC = c;
 	registers[dreg] = unsA + unsC;
 }
 
-//AND rd, ra, rb
+//AND dreg, ra, rb
 void andfunc(int dreg, int a, int b) {
 	registers[dreg] = registers[a] & registers[b];
 }
@@ -131,33 +132,32 @@ void multu(int a, int b) {
 	loreg = (product << 32) >> 32;
 }
 
-//OR rd, ra , rb
+//OR dreg, ra , rb
 void orfunc(int dreg, int a, int b) {
 	registers[dreg] = registers[a] | registers[b];
 }
 
-//ORI rd, ra, c
+
 void ori(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] | c;
 }
 
-//XOR rd, r1, r2
+//XOR dreg, r1, r2
 void xorfunc(int dreg, int reg1, int reg2) {
-	registers[dreg] = (registers[reg1]&(!registers[reg2])) | (registers[reg2]
-			&(!registers[reg1]));
+	registers[dreg] = registers[reg1]^registers[reg2];
 }
 
-//SLL rd, ra, c
+//SLL dreg, ra, c
 void sll(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] << c;
 }
 
-//SRA rd, ra, c
+//SRA dreg, ra, c
 void sra(int dreg, int a, signed int c) {
 	registers[dreg] = (signed int)registers[a] >> c;
 }
 
-//SRL rd, ra, c
+//SRL dreg, ra, c
 void srl(int dreg, int a, unsigned int c) {
 	registers[dreg] = registers[a] >> c;
 }
@@ -253,7 +253,6 @@ void jr(int a) {
 void mfhi(int a) {
 	registers[a] = hireg;
 }
-
 void mflo(int a) {
 	registers[a] = loreg;
 }
@@ -550,9 +549,9 @@ int main(int argc, char* argv[]) {
 	readFile(fileName);
 	if (mode == 0) { //if user passes run to completion mode
 		cout << "run to completion mode------" << endl;
-		
+
 		cout << "instruction: " << text[pc] << endl;
-		
+
 		while (text[pc] != 0) {
 			cout << "pc: " << pc << endl;
 			cout << "parseline: " << text[pc] << endl;
