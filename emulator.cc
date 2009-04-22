@@ -1,4 +1,4 @@
-//#include "emulator.h"
+#include "emulator.h"
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -42,8 +42,8 @@ int storeAddress(int address, int wordToStore) {
 		return stack[address - 0x7fffeffc] = wordToStore;
 	}
 
-// 	if (address>0x00400000 && address < 0x10010000) {
-// 		return text[address - 0x00400000] = wordToStore;
+ 	if (address>0x00400000 && address < 0x10010000) {
+ 		return text[address - 0x00400000] = wordToStore;
 
 	}
 	if (address > 0x10010000) {
@@ -61,12 +61,12 @@ void lbu(int a, unsigned int b, int c) {
 
 void lw(int a, int b, int c) {
   registers[a] = getAddress(b+registers[c]);
- 
+
   registers[a] =
     (getAddress(b+registers[c]))
- + 
+ +
     (getAddress(b+registers[c]+1) << 8)
-    + (getAddress(b+registers[c]+2) << 16) 
+    + (getAddress(b+registers[c]+2) << 16)
 + (getAddress(b+registers[c]+3) << 24);
 }
 
@@ -156,14 +156,16 @@ void sll(int dreg, int a, unsigned int c) {
 //SRA rd, ra, c
 void sra(int dreg, int a, int c) {
 
-	int sum = 0;
+	int num = a;
 	if(a < 0){
 		int i;
 		for (i = 0; i < c; i++) {
-			sum += -1*(2^(31-i));
+			num = (num >> 1) - 2^31;
 		}
 	}
-	registers[dreg] = (registers[a] >> c) + (sum * (registers[2] >> 31));
+	else{
+		registers[dreg] = (registers[a] >> c);
+	}
 }
 
 //SRL rd, ra, c
@@ -216,32 +218,32 @@ void sltiu(int dreg, int a, int c) {
 
 void beq(int a, int b, int c) {
 	if (registers[a] == registers[b])
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void bgez(int a, int c) {
 	if (registers[a] >= 0)
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void bgtz(int a, int c) {
 	if (registers[a] > 0)
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void blez(int a, int c) {
 	if (registers[a] <= 0)
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void bltz(int a, int c) {
 	if (registers[a] < 0)
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void bne(int a, int b, int c) {
 	if (registers[a] != registers[b])
-		pc += 4 + c*4;
+		pc += c*4;
 }
 
 void jump(int c) {
@@ -249,18 +251,18 @@ void jump(int c) {
 }
 
 void jal(int c) {
-	pc = (pc & 0xF0000000) + c*4;;
-	registers[31] = pc + 4;
+	registers[31] = pc;
+	pc = (pc & 0xF0000000) + c*4;
 }
 
 void jr(int a) {
 	pc = (pc & 0xF0000000) + registers[a]*4;
 }
 
+
 void mfhi(int a) {
 	registers[a] = hireg;
 }
-
 void mflo(int a) {
 	registers[a] = loreg;
 }
